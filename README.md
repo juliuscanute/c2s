@@ -1,1 +1,1 @@
-# A Simple REST Server using C++
+# A Simple REST Service using C++
