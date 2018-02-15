@@ -9,11 +9,16 @@ calculator
 
 
 Description of parameters:
+	cnumber: Denotes the number currently entered by the user.
 
-cnumber: Denotes the number currently entered by the user.
-pnumber: Denotes the number previously entered by the user.
-operation: Denotes the requested operation.
-cmemory: Denotes the memory value used my mem+, mem-, memrcl
+
+	pnumber: Denotes the number previously entered by the user.
+
+
+	operation: Denotes the requested operation.
+
+
+	cmemory: Denotes the memory value used my mem+, mem-, memrcl
 
 
 Addition
