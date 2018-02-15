@@ -14,7 +14,7 @@ namespace c2s
   {
 
     const std::string C2SCalculatorRestMethodPrototype::sPath = "calculator";
-    const std::set<std::string> C2SCalculatorRestMethodPrototype::m_mOperations = {"eql","add","sub","div"
+    const std::set<std::string> C2SCalculatorRestMethodPrototype::m_mOperations = {"add","sub","div"
                                                                                         ,"mul","mod","sqrt"
                                                                                         ,"mempls","memmin","memrcl"};
 

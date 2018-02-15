@@ -1,5 +1,19 @@
 # A Simple REST Service using C++
 
+Use cmake and make to build the project on a linux machine.
+
+execute:
+
+calculator
+
+
+
+Description of parameters:
+
+cnumber: Denotes the number currently entered by the user.
+pnumber: Denotes the number previously entered by the user.
+operation: Denotes the requested operation.
+cmemory: Denotes the memory value used my mem+, mem-, memrcl
 
 
 Addition
