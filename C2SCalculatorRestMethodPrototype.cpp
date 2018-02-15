@@ -14,19 +14,19 @@ namespace c2s
   {
 
     const std::string C2SCalculatorRestMethodPrototype::sPath = "calculator";
-    const std::set<std::string> C2SCalculatorRestMethodPrototype::m_mOperations = {"eql","pls","min","div"
+    const std::set<std::string> C2SCalculatorRestMethodPrototype::m_mOperations = {"eql","add","sub","div"
                                                                                         ,"mul","mod","sqrt"
-                                                                                        ,"mempls","memmin","memrcl"
-                                                                                        ,"clear"};
+                                                                                        ,"mempls","memmin","memrcl"};
 
     C2SCalculatorRestMethodPrototype::C2SCalculatorRestMethodPrototype()
       : C2SRestMethodPrototypeGET<std::string>( sPath ),
         m_pLogger( new io::DateTimeLogger( "calculator" ) ),
-        m_sNumber(),
-        m_sOperation()
+        m_sCNumber(),m_sPNumber(),m_sCMemory(),m_sOperation()
     {
       C2SRestMethodPrototypeGET<std::string>::installEntityStreamer( new C2SHttpEntityStreamerPlainText() );
-      C2SRestMethodPrototypeGET<std::string>::addQueryParameter( "number" , &m_sNumber , "invalid" );
+      C2SRestMethodPrototypeGET<std::string>::addQueryParameter( "cnumber" , &m_sCNumber , "invalid" );
+      C2SRestMethodPrototypeGET<std::string>::addQueryParameter( "pnumber" , &m_sPNumber , "invalid" );
+      C2SRestMethodPrototypeGET<std::string>::addQueryParameter( "cmemory" , &m_sCMemory , "invalid" );
       C2SRestMethodPrototypeGET<std::string>::addQueryParameter( "operation" , &m_sOperation , "invalid" ); 
     }
 
@@ -35,40 +35,74 @@ namespace c2s
       delete m_pLogger;
     }
 
-    C2SHttpResponse *C2SCalculatorRestMethodPrototype::process()
-    {
-      bool numIsInt = true,numIsFloat=false;
-
-      if(m_sNumber.compare("invalid")==0){
-        m_sFinalResponseEntity = std::string("Number is not specified in query.");
-        return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
-      } else {
-
+    inline bool C2SCalculatorRestMethodPrototype::isInt(std::string &number){
         try { 
-          cpp_int number(m_sNumber);
+          cpp_int number(number);
         } 
         catch (const std::exception& e) {
-          numIsInt = false;
+          return false;
         }
-        
-        if(!numIsInt){
-          try { 
-            cpp_dec_float_50 number(m_sNumber);
-            numIsFloat = true;
-          } 
-          catch (const std::exception& e) {
-            m_sFinalResponseEntity = std::string("Number format unrecognized.");
-            return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
-          }
-        }
+        return true;
+    }
 
-      }
-      if(m_mOperations.find(m_sOperation)==m_mOperations.end()){
-        m_sFinalResponseEntity = std::string("Unsupported operation.");
+
+    inline bool C2SCalculatorRestMethodPrototype::isFloat(std::string &number){
+        try { 
+            cpp_dec_float_50 number(number);
+          } 
+          catch (const std::exception& e) { 
+            return false;
+          }
+        return true;
+    }
+
+    inline bool C2SCalculatorRestMethodPrototype::isNumber(std::string &number){
+      return isInt(number) & isFloat(number);
+    }
+
+    C2SHttpResponse *C2SCalculatorRestMethodPrototype::process()
+    {
+
+      bool isFloat = false;
+      if(m_sCNumber.compare("invalid")!=0 && isNumber(m_sCNumber)){
+        if(!isInt(m_sCNumber)){
+          isFloat = true; 
+        }
+      } else {
+        m_sFinalResponseEntity = std::string("Current number is not specified in query.")+m_sCNumber;
         return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
       }
+
+      if(m_sPNumber.compare("invalid")!=0 && isNumber(m_sPNumber)){
+        if(!isInt(m_sPNumber)){
+          isFloat = true; 
+        }
+      } else {
+        m_sFinalResponseEntity = std::string("Previous number is not specified in query.");
+        return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
+      }
+
+      if(m_sCMemory.compare("invalid")==0 || !isNumber(m_sCMemory)){
+        m_sFinalResponseEntity = std::string("Current memory is not specified in query.");
+        return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
+      }
+
+      if(m_sOperation.compare("invalid")==0 || m_mOperations.find(m_sOperation) == m_mOperations.end()){
+        m_sFinalResponseEntity = std::string("Operation not specified in query.");
+        return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
+      }
+
+
+      C2SCalculatorController cController(m_sCNumber,m_sPNumber,m_sOperation,m_sCMemory,isFloat);
       try{
-        m_sFinalResponseEntity = m_cController.perform(m_sNumber,m_sOperation);
+        cController.perform();
+
+        m_sFinalResponseEntity = "{\"CurrentNumber\":"+cController.getCurrentNumber()+"," 
+        +"\"PreviousNumber\":"+cController.getPreviousNumber()+"," 
+        +"\"Operation\":"+"\""+cController.getOperation()+"\""+"," 
+        +"\"MemoryValue\":"+cController.getMemoryValue()+ 
+        "}";
+
       }catch (const std::exception& e) {
         m_sFinalResponseEntity = std::string("Operation failed!");
         return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );

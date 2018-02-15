@@ -26,7 +26,12 @@ namespace c2s
       void clear();
   	public:
   		C2SCalculatorController();
-  		std::string perform(std::string number,std::string operation);
+      C2SCalculatorController(std::string currentNumber,std::string previousNumber,std::string operation,std::string memory,bool isFloat);
+  		void perform();
+      std::string getCurrentNumber();
+      std::string getPreviousNumber();
+      std::string getOperation();
+      std::string getMemoryValue();
   	};
   }
 }

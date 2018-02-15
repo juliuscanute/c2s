@@ -24,6 +24,9 @@ namespace c2s
       virtual ~C2SCalculatorRestMethodPrototype();
 
       C2SHttpResponse *process();
+      bool isInt(std::string &number);
+      bool isFloat(std::string &number);
+      bool isNumber(std::string &number);
 
       C2SCalculatorRestMethodPrototype *clone() const;
 
@@ -34,13 +37,13 @@ namespace c2s
 
       io::DateTimeLogger *m_pLogger;
 
-      std::string m_sNumber;
-
+      std::string m_sCNumber;
+      std::string m_sPNumber;
+      std::string m_sCMemory;
       std::string m_sOperation;
 
       std::string m_sFinalResponseEntity;
 
-      C2SCalculatorController m_cController;
 
     };
 
