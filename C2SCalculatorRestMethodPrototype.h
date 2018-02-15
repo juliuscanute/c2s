@@ -3,6 +3,7 @@
 
 #include <set>
 #include "C2SRestMethodPrototypeGET.h"
+#include "C2SCalculatorController.h"
 
 namespace c2s
 {
@@ -38,6 +39,8 @@ namespace c2s
       std::string m_sOperation;
 
       std::string m_sFinalResponseEntity;
+
+      C2SCalculatorController m_cController;
 
     };
 

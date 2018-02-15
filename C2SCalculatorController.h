@@ -1,10 +1,14 @@
 #ifndef C2S_CALCULATOR_CONTROLLER_H
 #define C2S_CALCULATOR_CONTROLLER_H
-#include<string>
-
+#include <string>
+#include <stdexcept>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <sstream>
+
+#define TOSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 #include "C2SCalculator.h"
 

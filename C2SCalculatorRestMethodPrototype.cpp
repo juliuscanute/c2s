@@ -5,10 +5,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-#include <sstream>
-
-#define SSTR( x ) static_cast< std::ostringstream & >( \
-        ( std::ostringstream() << std::dec << x ) ).str()
+using boost::multiprecision::cpp_int;
+using boost::multiprecision::cpp_dec_float_50;
 
 namespace c2s
 {
@@ -40,8 +38,7 @@ namespace c2s
     C2SHttpResponse *C2SCalculatorRestMethodPrototype::process()
     {
       bool numIsInt = true,numIsFloat=false;
-      using boost::multiprecision::cpp_int;
-      using boost::multiprecision::cpp_dec_float_50;
+
       if(m_sNumber.compare("invalid")==0){
         m_sFinalResponseEntity = std::string("Number is not specified in query.");
         return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
@@ -70,7 +67,12 @@ namespace c2s
         m_sFinalResponseEntity = std::string("Unsupported operation.");
         return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
       }
-      m_sFinalResponseEntity = std::string("Number: ")+m_sNumber+std::string(" Operation: ")+m_sOperation;
+      try{
+        m_sFinalResponseEntity = m_cController.perform(m_sNumber,m_sOperation);
+      }catch (const std::exception& e) {
+        m_sFinalResponseEntity = std::string("Operation failed!");
+        return C2SRestMethodPrototypeGET<std::string>::buildResponse( BadRequest , m_sFinalResponseEntity );
+      }
       return C2SRestMethodPrototypeGET<std::string>::buildResponse( OK , m_sFinalResponseEntity );
     }
 
